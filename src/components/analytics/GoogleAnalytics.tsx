@@ -1,4 +1,4 @@
-
+// In src/components/analytics/GoogleAnalytics.tsx
 "use client";
 
 import Script from "next/script";
@@ -13,16 +13,15 @@ export function GoogleAnalytics() {
 
   useEffect(() => {
     if (!GA_MEASUREMENT_ID) {
-      // console.warn("Google Analytics Measurement ID is not set. Analytics disabled.");
       return;
     }
-    // Check if gtag is available (it should be after the scripts load)
-    if (typeof window.gtag !== 'function') {
-        // console.warn("window.gtag not available for pageview tracking yet.");
-        return;
+
+    // Check if gtag is available
+    if (typeof window !== 'undefined' && typeof window.gtag !== 'function') {
+      return;
     }
 
-    const url = pathname + (searchParams ? searchParams.toString() : "");
+    const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
     
     window.gtag("config", GA_MEASUREMENT_ID, {
       page_path: url,
