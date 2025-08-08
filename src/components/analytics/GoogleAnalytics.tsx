@@ -1,13 +1,13 @@
-// In src/components/analytics/GoogleAnalytics.tsx
+// Update src/components/analytics/GoogleAnalytics.tsx
 "use client";
 
 import Script from "next/script";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
-export function GoogleAnalytics() {
+function GoogleAnalyticsInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -16,16 +16,13 @@ export function GoogleAnalytics() {
       return;
     }
 
-    // Check if gtag is available
-    if (typeof window !== 'undefined' && typeof window.gtag !== 'function') {
-      return;
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
+      
+      window.gtag("config", GA_MEASUREMENT_ID, {
+        page_path: url,
+      });
     }
-
-    const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
-    
-    window.gtag("config", GA_MEASUREMENT_ID, {
-      page_path: url,
-    });
   }, [pathname, searchParams]);
 
   if (!GA_MEASUREMENT_ID) {
@@ -53,5 +50,13 @@ export function GoogleAnalytics() {
         }}
       />
     </>
+  );
+}
+
+export function GoogleAnalytics() {
+  return (
+    <Suspense fallback={null}>
+      <GoogleAnalyticsInner />
+    </Suspense>
   );
 }
