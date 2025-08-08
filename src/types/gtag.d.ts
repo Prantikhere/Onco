@@ -1,4 +1,4 @@
-// Create ./src/types/gtag.d.ts
+// Create src/types/global.d.ts
 declare global {
   interface Window {
     gtag: (
